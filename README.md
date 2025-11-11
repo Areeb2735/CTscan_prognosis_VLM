@@ -210,7 +210,7 @@ See `main_ctpt.py` for CT+PET multi-modal implementation.
   - Baseline: [Report baseline results]
   - With PET: **5% improvement** in Dice score compared to CT-only
 
-## 📝 Citation
+<!-- ## 📝 Citation
 
 If you use MAFM³ in your research, please cite:
 
@@ -221,7 +221,7 @@ If you use MAFM³ in your research, please cite:
   journal={[Journal/Conference]},
   year={2024}
 }
-```
+``` -->
 
 ## 📄 License
 
@@ -236,7 +236,7 @@ See [LICENSE](LICENSE) for details.
 
 ## 📧 Contact
 
-For questions or issues, please open an issue on GitHub or contact [mohammad.qazi@gmail.com](mailto:mohammad.qazi@gmail.com).
+For questions or issues, please open an issue on GitHub or contact [mohammad.qazi@gmail.com](mailto:mohammad.qazi@mbzuai.ac.ae).
 
 ## 🔗 Related Work
 
