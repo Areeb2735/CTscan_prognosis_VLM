@@ -74,7 +74,7 @@ def main() -> None:
     method = args.method
     num_time_bins = args.num_time_bins
 
-    hect_dataset = Hector_Dataset_emb(emd_path = 'docs/embeddings/spatial_new.npy',  
+    hect_dataset = Hector_Dataset_emb(emd_path = 'docs/embeddings/spatial_monai_again.npy',  
                     csv_file ="docs/TNM_hector_prompts.csv", args=args)
 
     best_ci_list = []

@@ -296,12 +296,12 @@ class CTViT(nn.Module):
         attn_bias = self.spatial_rel_pos_bias(h, w, device = device)
 
 
-        tokens = self.enc_spatial_transformer(tokens, attn_bias = attn_bias, video_shape = video_shape)
+        tokens, hidden_state = self.enc_spatial_transformer(tokens, attn_bias = attn_bias, video_shape = video_shape)
 
         tokens = rearrange(tokens, '(b t) (h w) d -> b t h w d', b = b, h = h , w = w)
 
         if only_spatial:
-            return tokens
+            return tokens, hidden_state
 
         # encode - temporal
 
@@ -399,10 +399,10 @@ class CTViT(nn.Module):
 
         # encode - spatial
 
-        tokens = self.encode(tokens, only_spatial = True)
+        tokens, hidden_state = self.encode(tokens, only_spatial = True)
 
         if return_spatial_tokens:
-            return tokens
+            return tokens, hidden_state
         # quantize
 
         tokens, packed_fhw_shape = pack([tokens], 'b * d')

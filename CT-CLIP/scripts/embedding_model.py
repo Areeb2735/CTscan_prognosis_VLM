@@ -10,6 +10,7 @@ from transformer_maskgit import CTViT
 from transformers import BertTokenizer, BertModel
 from lifelines.utils import concordance_index
 from data_inference_hector import Hector_Dataset
+from monai_dataset import get_loader_emb_gen
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -50,10 +51,13 @@ clip.to(device)
 
 model = emb_gen(clip, device = device)
 
-hect_dataset = Hector_Dataset(data_folder = "/share/sda/mohammadqazi/project/hector/pre_processed/",  
-                csv_file ="docs/TNM_hector_prompts.csv")
+# hect_dataset = Hector_Dataset(data_folder = "/share/sda/mohammadqazi/project/hector/pre_processed/",  
+#                 csv_file ="docs/TNM_hector_prompts.csv")
 
-loader = DataLoader(hect_dataset, batch_size=8, shuffle=False)
+# loader = DataLoader(hect_dataset, batch_size=8, shuffle=False)
+
+loader = get_loader_emb_gen(ct_path = '/share/sda/mohammadqazi/project/hector/dataset/processed_samples_all',
+    csv_file ="docs/TNM_hector_prompts.csv")
 
 import numpy as np
 import os
@@ -63,7 +67,9 @@ embeddings_dict = {}
 
 # model.eval()
 with torch.no_grad():
-    for video, text, relapse, RFS, file_names in tqdm(loader):  # Assuming file_names is part of your dataset
+    # for video, text, relapse, RFS, file_names in tqdm(loader):  # Assuming file_names is part of your dataset
+    for sample in tqdm(loader):
+        video, text = sample['ct'], sample['text']
         video = video.to(device)
         text_tokens = tokenizer(
             text, 
@@ -81,14 +87,14 @@ with torch.no_grad():
         text_emb = text_emb.cpu().numpy()
 
         # Save embeddings in the dictionary
-        for i, file_name in enumerate(file_names):
+        for i, file_name in enumerate(sample['filename']):
             embeddings_dict[file_name] = {
                 'image_embedding': img_emb[i],
                 'text_embedding': text_emb[i],
             }
 
 # Save the embeddings dictionary as a .npy file
-filename = 'spatial_new.npy'
+filename = 'spatial_monai_again.npy'
 save_path = f'docs/embeddings/{filename}'
 np.save(save_path, embeddings_dict)
 print(f"Embeddings saved to {save_path}")

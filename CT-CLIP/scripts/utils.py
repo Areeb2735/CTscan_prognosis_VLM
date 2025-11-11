@@ -515,3 +515,69 @@ class Dice_and_FocalLoss(nn.Module):
     def forward(self, input, target):
         loss = self.dice_loss(input, target) + self.focal_loss(input, target)
         return loss
+
+def dice(input, target):
+    axes = tuple(range(1, input.dim()))
+    bin_input = (input > 0.5).float()
+
+    intersect = (bin_input * target).sum(dim=axes)
+    union = bin_input.sum(dim=axes) + target.sum(dim=axes)
+    score = 2 * intersect / (union + 1e-3)
+
+    return score.mean()
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+def save_input_target_prediction(input_volume, target_volume, prediction_volume, filename):
+
+    input_volume = input_volume.squeeze(0).squeeze(0).cpu().detach().numpy()
+    target_volume = target_volume.squeeze(0).squeeze(0).cpu().detach().numpy()
+    prediction_volume = prediction_volume.squeeze(0).squeeze(0).cpu().detach().numpy()
+    prediction_volume_1 = prediction_volume[0]
+    prediction_volume_2 = prediction_volume[1]
+    # prediction_volume_3 = prediction_volume[2]
+    """
+    Save mid-slices of the input, target, and prediction volumes into a single image file.
+    
+    Parameters:
+    - input_volume: 3D numpy array representing the input (e.g., CT scan)
+    - target_volume: 3D numpy array representing the target segmentation or ground truth
+    - prediction_volume: 3D numpy array representing the prediction from the model
+    - filename: string, path to save the combined image (e.g., 'output.png')
+    """
+    def get_mid_slices(volume):
+        # Compute the mid-slices for each of the three dimensions.
+        axial     = volume[volume.shape[0] // 2, :, :]
+        coronal   = volume[:, volume.shape[1] // 2, :]
+        sagittal  = volume[:, :, volume.shape[2] // 2]
+        return axial, coronal, sagittal
+
+    # Get mid-slices for input, target, and prediction
+    input_slices      = get_mid_slices(input_volume)
+    target_slices     = get_mid_slices(target_volume)
+    # prediction_slices = get_mid_slices(prediction_volume)
+    prediction_slices_1 = get_mid_slices(prediction_volume_1)
+    prediction_slices_2 = get_mid_slices(prediction_volume_2)
+    # prediction_slices_3 = get_mid_slices(prediction_volume_3)
+
+    # Create a 3x3 subplot: rows correspond to (Input, Target, Prediction)
+    # and columns correspond to (Axial, Coronal, Sagittal) views.
+    fig, axes = plt.subplots(4, 3, figsize=(18, 18))
+    
+    # Define row and column titles for clarity
+    # row_titles = ['Input', 'Target', 'Prediction_0', 'Prediction_1', 'Prediction_2']
+    row_titles = ['Input', 'Target', 'Prediction_0', 'Prediction_1']
+    col_titles = ['Axial', 'Coronal', 'Sagittal']
+    
+    # Plot each slice in its respective subplot
+    for i, slices in enumerate([input_slices, target_slices, prediction_slices_1, prediction_slices_2]):
+        for j, slice_img in enumerate(slices):
+            ax = axes[i, j]
+            ax.imshow(slice_img, cmap='gray')
+            ax.set_title(f"{row_titles[i]} - {col_titles[j]}")
+            ax.axis('off')
+    
+    plt.tight_layout()
+    plt.savefig(filename)
+    plt.close(fig)

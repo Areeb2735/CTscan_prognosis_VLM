@@ -714,7 +714,7 @@ class CTCLIP(nn.Module):
         )"""
 
         # enc_image, hidden_state = self.visual_transformer(image, return_encoded_tokens=True, return_spatial_tokens=True)
-        enc_image = self.visual_transformer(image, return_encoded_tokens=True, return_spatial_tokens=True)
+        enc_image, hidden_state = self.visual_transformer(image, return_encoded_tokens=True, return_spatial_tokens=True)
 
 
         # segmantation_part(image, hidden_state, device)
@@ -743,7 +743,7 @@ class CTCLIP(nn.Module):
         # print("test all pooling")
 
         if prognosis:
-            return enc_image, enc_text
+            return enc_image, enc_text, hidden_state
 
         enc_image = enc_image.view(enc_image.shape[0], -1)
 

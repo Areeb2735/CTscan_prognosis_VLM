@@ -320,7 +320,7 @@ class Transformer(nn.Module):
         cross_attn_context_mask = None
     ):
 
-        # hidden_state = []
+        hidden_state = []
         for peg, self_attn, cross_attn, ff in self.layers:
             if exists(peg):
                 x = peg(x, shape = video_shape) + x
@@ -333,6 +333,6 @@ class Transformer(nn.Module):
             x = ff(x) + x
 
             # hidden_state.append(x.reshape(int(x.shape[0]/24), 13824, 512))
-            # hidden_state.append(x.reshape(int(x.shape[0]/24), 512, 24, 24, 24))
+            hidden_state.append(x.reshape(int(x.shape[0]/24), 512, 24, 24, 24))
 
-        return self.norm_out(x)
+        return self.norm_out(x), hidden_state

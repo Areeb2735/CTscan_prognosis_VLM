@@ -163,7 +163,7 @@ class Hector_Dataset_emb(Dataset):
         y_bins, y_events = lbltrans.fit_transform(self.dataframe['RFS'].values, self.dataframe['Relapse'].values)
         
         for index, row in self.dataframe.iterrows():
-            filename = row['PatientID'] + "_ct_roi.npz"
+            filename = row['PatientID'] + "_ct_roi.nii.gz"
             # filepath = os.path.join(self.data_folder, filename)
             image_embedding = self.emd[filename]['image_embedding']
             text_embedding = self.emd[filename]['text_embedding']
@@ -268,17 +268,24 @@ class Hector_Dataset_segmentation_emb_subset(Dataset):
     def __init__(self, samples, parent_dataset):
         self.samples = samples
         self.parent_dataset = parent_dataset
-        self.target_size = (80, 80, 48)
+        self.target_size = (96,96,96)
 
     def __len__(self):
         return len(self.samples)
 
     def __getitem__(self, index):
-        hidden_state, filepath_ct, filepath_mask, fold= self.samples[index]
-        ct_tensor = self.parent_dataset.nii_img_to_tensor(filepath_ct)
+        hidden_state, filepath_ct, filepath_mask, fold = self.samples[index]
+        
         mask_tensor = self.parent_dataset.read_data(filepath_mask)
         mask_tensor = mask_tensor.float()
         mask_tensor = mask_tensor.unsqueeze(0)
         mask_tensor = F.interpolate(mask_tensor, size=self.target_size, mode='nearest')
         mask_tensor = mask_tensor.squeeze(0)
+        mask_tensor = mask_tensor.long()
+
+        ct_tensor = self.parent_dataset.nii_img_to_tensor(filepath_ct)
+        ct_tensor = F.interpolate(ct_tensor.unsqueeze(0), size=self.target_size, mode='nearest')
+        ct_tensor = ct_tensor.squeeze(0)
+
         return hidden_state, ct_tensor, mask_tensor, fold
+

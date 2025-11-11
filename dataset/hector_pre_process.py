@@ -11,7 +11,7 @@ def read_nii_ct_files(directory):
     nii_files = []
     for root, dirs, files in os.walk(directory):
         for file in files:
-            if 'pt' in file and file.endswith('.nii.gz'):
+            if 'ct' in file and file.endswith('.nii.gz'):
                 nii_files.append(os.path.join(root, file))  
     return nii_files
 

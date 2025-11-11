@@ -108,8 +108,8 @@ class model_lora_again(nn.Module):
             nn.Linear(512, 128),
         )
 
-        self.mtlr = MTLR(in_features=128, num_time_bins=num_time_bins)
-        # self.final_layer = nn.Linear(128, num_time_bins)
+        # self.mtlr = MTLR(in_features=128, num_time_bins=num_time_bins)
+        self.final_layer = nn.Linear(128, num_time_bins)
 
     def forward(self, img, text):
 
@@ -126,8 +126,8 @@ class model_lora_again(nn.Module):
         fuse = self.fuse(fuse)
         # fuse = self.fuse(text)
 
-        pred = self.mtlr(fuse)  
-        # pred = self.final_layer(fuse)
+        # pred = self.mtlr(fuse)  
+        pred = self.final_layer(fuse)
         
         return pred
 
@@ -282,7 +282,7 @@ class embd_model_linear_with_adapter(nn.Module):
         fuse = torch.cat([img, text], dim=1) 
 
         fuse = self.fuse(fuse)
-        # fuse = self.fuse(img)
+        # fuse = self.fuse(text)
 
         # pred = self.mtlr(fuse)
         pred = self.final_layer(fuse)

@@ -1,3 +1,101 @@
-docs/
-wandb/
+# Python
 __pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb_checkpoints
+
+# Model weights and checkpoints
+*.pth
+*.pt
+*.ckpt
+*.h5
+*.hdf5
+*.pkl
+*.pickle
+docs/CT-CLIP_v2.pt
+docs/weights_*/
+docs/embeddings/*.npy
+
+# Data files
+*.nii.gz
+*.npz
+*.npy
+!docs/TNM_hector_prompts.csv
+
+# Logs and outputs
+wandb/
+*.log
+*.txt
+!requirements.txt
+!README.md
+output.txt
+*.png
+*.jpg
+*.jpeg
+!docs/*.png
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.backup
+
+# CSV data files (keep only sample/example ones)
+final_hector*.csv
+Patient_Data*.csv
+filenames*.txt
+
+# Archive files
+*.zip
+*.tar
+*.tar.gz
+
+# MONAI cache
+.monai/
+
+# PyTorch
+*.pth.tar
+
+# Results and experiments
+results/
+experiments/
+checkpoints/

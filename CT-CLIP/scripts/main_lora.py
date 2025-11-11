@@ -22,6 +22,7 @@ from transformer_maskgit import CTViT
 from transformers import BertTokenizer, BertModel
 from lifelines.utils import concordance_index
 from data_inference_hector import Hector_Dataset_lora
+from monai_dataset import get_loader_prognosis
 
 from pycox.models import CoxPH, MTLR, DeepHitSingle
 from pycox import models
@@ -112,18 +113,23 @@ def main() -> None:
     method = args.method
     num_time_bins = args.num_time_bins
 
-    hect_dataset = Hector_Dataset_lora(data_folder = "/share/sda/mohammadqazi/project/hector/pre_processed/",  
-                csv_file ="docs/TNM_hector_prompts.csv", args=args)
+    # hect_dataset = Hector_Dataset_lora(data_folder = "/share/sda/mohammadqazi/project/hector/pre_processed/",  
+    #             csv_file ="docs/TNM_hector_prompts.csv", args=args)
 
     best_ci_list = []
 
     for fold in range(5):
         print(f"Fold {fold}")
 
-        train_dataset, test_dataset = hect_dataset.train_val_split(fold=fold)
+        train_loader, test_loader =  get_loader_prognosis(ct_path = '/share/sda/mohammadqazi/project/hector/dataset/processed_samples_all',
+            csv_file ="docs/TNM_hector_prompts.csv", fold=fold, args = args)
 
-        train_loader = DataLoader(train_dataset, batch_size=4, shuffle=True)
-        test_loader = DataLoader(test_dataset, batch_size=1, shuffle=False)
+        # train_dataset, test_dataset = hect_dataset.train_val_split(fold=fold)
+
+        # train_loader = DataLoader(train_dataset, batch_size=4, shuffle=True)
+        # test_loader = DataLoader(test_dataset, batch_size=1, shuffle=False)
+
+
 
         if method == 'mtlr':
             loss_fc = models.loss.NLLMTLRLoss()
@@ -145,8 +151,8 @@ def main() -> None:
         # )
         
         target = [
-            # "to_q", "to_kv", "to_out", 
-            "query", "key", "value"
+            "to_q", "to_kv", "to_out", 
+            # "query", "key", "value"
             ]
         peft_config = LoraConfig(
             inference_mode=False, r=2, lora_alpha=32, lora_dropout=0.2, target_modules=target
@@ -155,11 +161,12 @@ def main() -> None:
         model = model_lora_again(clip, device, peft_config, num_time_bins)
         model.to(device)
 
-        img_emb, text_emb, relapse, RFS, _, _, _ = next(iter(train_loader))
+        # img_emb, text_emb, relapse, RFS, _, _, _ = next(iter(train_loader))
+        sample = next(iter(train_loader))
+        img_emb = sample['ct']
+        text_emb = sample['text']
         img_emb = img_emb.to(device)
         text_tokens=tokenizer(text_emb, return_tensors="pt", padding="max_length", truncation=True, max_length=512).to(device)
-        relapse = relapse.to(device)
-        RFS = RFS.to(device)
         summary(model, input_data=[img_emb, text_tokens ], depth=8, col_names=["input_size", "output_size", "num_params", 'trainable'],)
 
         # trainable_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
@@ -170,19 +177,6 @@ def main() -> None:
         num_epochs = 50
         verbose=True
 
-
-        # Suppose your model has a method to filter out LoRA parameters
-        # lora_params = [param for name, param in model.named_parameters() if "lora" in name]
-        # base_params = [param for name, param in model.named_parameters() if "lora" not in name]
-
-        # optimizer = AdamW([
-        #     {'params': lora_params, 'lr': 1e-5},   # lower LR for LoRA parts
-        #     {'params': base_params, 'lr': 3e-4}    # higher LR for the rest of the model
-        # ])
-
-        
-        # trainable_params = [p for p in model.parameters() if p.requires_grad]
-        # optimizer = AdamW(trainable_params, lr=3e-4, weight_decay=0.00001)
         optimizer = AdamW(model.parameters(), lr=3e-4, weight_decay=0.00001)
 
         # optimizer = make_optimizer(AdamW, model, lr=3e-4, weight_decay=0.00001)
@@ -193,7 +187,13 @@ def main() -> None:
         best_metrics = None
         for i in pbar:
             model.train()
-            for j, (img_emb, text_emb, relapse, RFS, _, _, y_bins) in enumerate(train_loader):
+            # for j, (img_emb, text_emb, relapse, RFS, _, _, y_bins) in enumerate(train_loader):
+            for sample in train_loader:
+                img_emb = sample['ct']
+                text_emb = sample['text']
+                relapse = sample['relapse']
+                RFS = sample['RFS']
+                y_bins = sample['y_bin']
                 img_emb = img_emb.to(device)
                 text_emb=tokenizer(text_emb, return_tensors="pt", padding="max_length", truncation=True, max_length=512).to(device)
                 y_pred = model(img_emb, text_emb)
@@ -241,6 +241,7 @@ def main() -> None:
     # Save overall results
     with open(f'docs/weights_4/{exp_name}/final_result.txt', 'w') as f:
         f.write(f"Average Best CI: {average_best_ci:.4f}\n")
+        f.write(f"Best CI: {best_ci_list}\n")
 
 def validation(model, test_loader, device):
     print("Validation of the model")
@@ -250,7 +251,13 @@ def validation(model, test_loader, device):
     RFS_all = []
     pred_survival_all = []
     with torch.no_grad():
-        for img_emb, text_emb, relapse, RFS, _, _, _ in test_loader:
+        # for img_emb, text_emb, relapse, RFS, _, _, _ in test_loader:
+        for sample in test_loader:
+            img_emb = sample['ct']
+            text_emb = sample['text']
+            relapse = sample['relapse']
+            RFS = sample['RFS']
+
             img_emb = img_emb.to(device)
             text_emb=tokenizer(text_emb, return_tensors="pt", padding="max_length", truncation=True, max_length=512).to(device)
 

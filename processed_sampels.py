@@ -147,9 +147,9 @@ def process_case(pet_path, ct_path, mask_path, output_dir):
         
         # Save results
         case_id = pet_path.stem.split('__')[0]
-        # sitk.WriteImage(pet_cropped, str(output_dir / f"{case_id}_pt_roi.nii.gz"))
+        sitk.WriteImage(pet_cropped, str(output_dir / f"{case_id}_pt_roi.nii.gz"))
         # sitk.WriteImage(ct_cropped, str(output_dir / f"{case_id}_ct_roi.nii.gz"))
-        sitk.WriteImage(mask_cropped, str(output_dir / f"{case_id}_mask_roi.nii.gz"))
+        # sitk.WriteImage(mask_cropped, str(output_dir / f"{case_id}_mask_roi.nii.gz"))
         
         return {
             'case_id': case_id,
