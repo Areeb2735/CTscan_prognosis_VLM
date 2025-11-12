@@ -236,7 +236,7 @@ See [LICENSE](LICENSE) for details. -->
 
 ## 📧 Contact
 
-For questions or issues, please open an issue on GitHub or contact [mohammad.qazi@gmail.com](mailto:mohammad.qazi@mbzuai.ac.ae).
+For questions or issues, please open an issue on GitHub or contact [mohammad.qazi@mbzuai.ac.ae](mailto:mohammad.qazi@mbzuai.ac.ae).
 
 ## 🔗 Related Work
 
