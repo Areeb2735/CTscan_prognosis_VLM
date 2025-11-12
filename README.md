@@ -1,6 +1,6 @@
 # MAFM³: Modular Adaptation of Foundation Models for Multi-Modal Medical AI
 
-[![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
+<!-- [![License: CC BY-NC-SA 4.0](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-nc-sa/4.0/) -->
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 
 This repository contains the implementation of **MAFM³** (Modular Adaptation of Foundation Models for Multi-Modal Medical AI), a framework that enables a single foundation model to adapt to diverse domains, tasks, and modalities using lightweight modular components.
@@ -26,15 +26,15 @@ MAFM³ addresses the challenge of data scarcity in medical imaging by allowing a
   - [Segmentation Module](#segmentation-module)
 - [Methodology](#methodology)
 - [Results](#results)
-- [Citation](#citation)
-- [License](#license)
+<!-- - [Citation](#citation)
+- [License](#license) -->
 
 ## 🔧 Installation
 
 ### Prerequisites
 
 - Python 3.8+
-- CUDA-capable GPU (recommended: A100 with 80GB VRAM for training)
+- CUDA-capable GPU
 - PyTorch 2.4+
 
 ### Setup
@@ -208,7 +208,7 @@ See `main_ctpt.py` for CT+PET multi-modal implementation.
 - **Metric**: Dice Score
 - **Performance**: 
   - Baseline: [Report baseline results]
-  - With PET: **5% improvement** in Dice score compared to CT-only
+  - With PET: Improvments in Dice score compared to CT-only
 
 <!-- ## 📝 Citation
 
@@ -223,11 +223,11 @@ If you use MAFM³ in your research, please cite:
 }
 ``` -->
 
-## 📄 License
+<!-- ## 📄 License
 
 This project is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License (CC BY-NC-SA 4.0).
 
-See [LICENSE](LICENSE) for details.
+See [LICENSE](LICENSE) for details. -->
 
 ## 🙏 Acknowledgments
 
